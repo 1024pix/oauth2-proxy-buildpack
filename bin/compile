@@ -2,8 +2,7 @@
 
 set -eo pipefail
 
-OAUTH2_PROXY_VERSION="${OAUTH2_PROXY_VERSION:=v7.6.0}"
-OAUTH2_PROXY_CHECKSUM="5e2f84ded61074b5f33eeef2c9f6d2d94294bcc9f9802e78921f02189ece0988"
+OAUTH2_PROXY_VERSION="${OAUTH2_PROXY_VERSION:=v7.13.0}"
 
 BP_DIR="$(cd $(dirname "$0"); pwd)"
 BUILD_DIR="$1"
@@ -15,16 +14,9 @@ tmp_dir="${tmp_dir%/}"
 mkdir -p "$BUILD_DIR/bin"
 
 echo "downloading oauth2-proxy..."
-wget --no-verbose "https://github.com/oauth2-proxy/oauth2-proxy/releases/download/${OAUTH2_PROXY_VERSION}/oauth2-proxy-${OAUTH2_PROXY_VERSION}.linux-amd64.tar.gz" -O $tmp_dir/oauth2-proxy.tar.gz
 
-echo "$OAUTH2_PROXY_CHECKSUM  $tmp_dir/oauth2-proxy.tar.gz" | sha256sum -c -
-
-tar -xzf $tmp_dir/oauth2-proxy.tar.gz -C "$BUILD_DIR/bin" --strip-components=1
-
-
-
+tarball_url="https://github.com/oauth2-proxy/oauth2-proxy/releases/download/${OAUTH2_PROXY_VERSION}/oauth2-proxy-${OAUTH2_PROXY_VERSION}.linux-amd64.tar.gz"
+curl --silent --fail -L "${tarball_url}" | tar -xzf - -C "$BUILD_DIR/bin" -o --strip-components=1
 
 # write out a start script
 cp "${BP_DIR}"/../scripts/start_*.sh "${BUILD_DIR}/bin"
-
-
