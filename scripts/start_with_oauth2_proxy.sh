@@ -2,6 +2,11 @@
 
 set -eo pipefail
 
+if [ -n "${OAUTH2_PROXY_DISABLE}" ]; then
+    echo "OAUTH2_PROXY_DISABLE is set, skipping oauth2-proxy and starting backend directly..." >&2
+    "$@"
+fi
+
 # This pipe setup is not my invention but the same one used by
 # https://github.com/heroku/heroku-buildpack-static
 
