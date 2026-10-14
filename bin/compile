@@ -2,7 +2,9 @@
 
 set -eo pipefail
 
-OAUTH2_PROXY_VERSION="${OAUTH2_PROXY_VERSION:=v7.13.0}"
+OAUTH2_PROXY_VERSION="${OAUTH2_PROXY_VERSION:=v7.15.5}"
+# oauth2-proxy-${OAUTH2_PROXY_VERSION}.linux-amd64-sha256sum.txt
+OAUTH2_PROXY_CHECKSUM="ed5063f5a655560048a594974210f1c9e4f539bbfe81a834addb6fc740f3309d"
 
 BP_DIR="$(cd $(dirname "$0"); pwd)"
 BUILD_DIR="$1"
@@ -17,6 +19,9 @@ echo "downloading oauth2-proxy..."
 
 tarball_url="https://github.com/oauth2-proxy/oauth2-proxy/releases/download/${OAUTH2_PROXY_VERSION}/oauth2-proxy-${OAUTH2_PROXY_VERSION}.linux-amd64.tar.gz"
 curl --silent --fail -L "${tarball_url}" | tar -xzf - -C "$BUILD_DIR/bin" -o --strip-components=1
+
+# Protection against supply chain attack
+echo "$OAUTH2_PROXY_CHECKSUM  $BUILD_DIR/bin/oauth2-proxy" | sha256sum -c
 
 # write out a start script
 cp "${BP_DIR}"/../scripts/start_*.sh "${BUILD_DIR}/bin"
